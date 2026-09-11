@@ -45,6 +45,67 @@
             font-size: 14px;
         }
 
+        .stopwatch-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .stopwatch-display {
+            font-size: 36px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .stopwatch-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .stopwatch-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .stopwatch-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .stopwatch-btn:active {
+            transform: scale(0.95);
+        }
+
+        .stopwatch-btn.start {
+            background: rgba(39, 174, 96, 0.8);
+        }
+
+        .stopwatch-btn.start:hover {
+            background: rgba(39, 174, 96, 1);
+        }
+
+        .stopwatch-btn.stop {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        .stopwatch-btn.stop:hover {
+            background: rgba(231, 76, 60, 1);
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -183,6 +244,15 @@
             <p>Sign in to your account</p>
         </div>
 
+        <div class="stopwatch-container">
+            <div class="stopwatch-display" id="stopwatchDisplay">00:00:00</div>
+            <div class="stopwatch-controls">
+                <button type="button" class="stopwatch-btn start" id="startBtn">Start</button>
+                <button type="button" class="stopwatch-btn stop" id="stopBtn">Stop</button>
+                <button type="button" class="stopwatch-btn" id="resetBtn">Reset</button>
+            </div>
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
@@ -229,6 +299,65 @@
     </div>
 
     <script>
+        // Stopwatch functionality
+        let stopwatchInterval = null;
+        let elapsedTime = 0;
+
+        const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function startStopwatch() {
+            if (stopwatchInterval === null) {
+                const startTime = Date.now() - elapsedTime;
+                stopwatchInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    stopwatchDisplay.textContent = formatTime(elapsedTime);
+                }, 100);
+                startBtn.textContent = 'Resume';
+            }
+        }
+
+        function stopStopwatch() {
+            if (stopwatchInterval !== null) {
+                clearInterval(stopwatchInterval);
+                stopwatchInterval = null;
+            }
+        }
+
+        function resetStopwatch() {
+            stopStopwatch();
+            elapsedTime = 0;
+            stopwatchDisplay.textContent = '00:00:00';
+            startBtn.textContent = 'Start';
+        }
+
+        startBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            startStopwatch();
+        });
+
+        stopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            stopStopwatch();
+        });
+
+        resetBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetStopwatch();
+        });
+
+        // Login form functionality
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
